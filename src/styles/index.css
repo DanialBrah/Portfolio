@@ -1,0 +1,257 @@
+@import 'tailwindcss';
+
+/*
+  Self-hosted fonts.
+
+  These were previously loaded from fonts.googleapis.com, which sent every
+  visitor's IP address to Google — a GDPR exposure with no upside. Serving them
+  from our own origin also removes two DNS lookups and a render-blocking
+  stylesheet, and lets the CSP use `font-src 'self'`.
+
+  Both files are variable fonts, so a single file covers the whole weight range
+  rather than one request per weight.
+*/
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('../assets/fonts/inter-latin-variable.woff2') format('woff2');
+  /* Latin basic + supplement; everything on this site falls inside it. */
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Sora';
+  font-style: normal;
+  font-weight: 100 800;
+  font-display: swap;
+  src: url('../assets/fonts/sora-latin-variable.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215,
+    U+FEFF, U+FFFD;
+}
+
+/*
+  Class-based dark mode. Tailwind v4 defaults to the `prefers-color-scheme`
+  media query; this variant lets the ThemeProvider drive it from a `.dark`
+  class on <html> so the user's explicit choice can override the OS.
+*/
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* ---- Brand ramp, seeded from #C2185B ------------------------------- */
+  --color-brand-50: #fce4ec;
+  --color-brand-100: #f8bbd0;
+  --color-brand-200: #f48fb1;
+  --color-brand-300: #f06292;
+  --color-brand-400: #ec407a;
+  --color-brand-500: #c2185b;
+  --color-brand-600: #ad1457;
+  --color-brand-700: #880e4f;
+  --color-brand-800: #6d0b3f;
+  --color-brand-900: #4a0729;
+
+  /* ---- Surface accent, seeded from #E0F2FE --------------------------- */
+  --color-surface-50: #f0f9ff;
+  --color-surface-100: #e0f2fe;
+  --color-surface-200: #bae6fd;
+  --color-surface-300: #7dd3fc;
+  --color-surface-400: #38bdf8;
+
+  /*
+    Semantic tokens. Each maps onto a runtime variable that :root and .dark
+    redefine below, so components can write `bg-bg` / `text-fg` and never
+    branch on the active theme.
+  */
+  --color-bg: var(--tone-bg);
+  --color-bg-soft: var(--tone-bg-soft);
+  --color-surface: var(--tone-surface);
+  --color-card: var(--tone-card);
+  --color-fg: var(--tone-fg);
+  --color-muted: var(--tone-muted);
+  --color-subtle: var(--tone-subtle);
+  --color-border: var(--tone-border);
+  --color-accent: var(--tone-accent);
+  --color-accent-soft: var(--tone-accent-soft);
+  --color-on-accent: var(--tone-on-accent);
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Sora', 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  --radius-4xl: 2rem;
+
+  --shadow-glow: 0 0 0 1px color-mix(in oklab, var(--tone-accent) 22%, transparent),
+    0 18px 45px -18px color-mix(in oklab, var(--tone-accent) 45%, transparent);
+
+  --animate-marquee: marquee 32s linear infinite;
+  --animate-float: float 7s ease-in-out infinite;
+  --animate-blob: blob 18s ease-in-out infinite;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-12px);
+    }
+  }
+  @keyframes blob {
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1);
+    }
+    33% {
+      transform: translate(28px, -34px) scale(1.08);
+    }
+    66% {
+      transform: translate(-22px, 18px) scale(0.94);
+    }
+  }
+}
+
+/* ---- Light theme ----------------------------------------------------- */
+:root {
+  --tone-bg: #ffffff;
+  --tone-bg-soft: #f8fafc;
+  --tone-surface: #e0f2fe;
+  --tone-card: #ffffff;
+  --tone-fg: #0f172a;
+  --tone-muted: #475569;
+  --tone-subtle: #64748b;
+  --tone-border: #d8e6f2;
+  --tone-accent: #c2185b;
+  --tone-accent-soft: #fce4ec;
+  --tone-on-accent: #ffffff;
+
+  color-scheme: light;
+}
+
+/*
+  Dark theme. The accent lightens from #C2185B to #F06292 on purpose:
+  #C2185B against #0B1120 is ~2.9:1, which fails WCAG AA, while #F06292
+  clears 7:1. Everything else keeps the same role, so no component changes.
+*/
+.dark {
+  --tone-bg: #0b1120;
+  --tone-bg-soft: #0f172a;
+  --tone-surface: #141c2e;
+  --tone-card: #141c2e;
+  --tone-fg: #e8edf7;
+  --tone-muted: #a5b4c8;
+  --tone-subtle: #8296ad;
+  --tone-border: #24314a;
+  --tone-accent: #f06292;
+  --tone-accent-soft: #3b1226;
+  --tone-on-accent: #1a0410;
+
+  color-scheme: dark;
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    border-color: var(--color-border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    /* Belt-and-braces against a stray wide child breaking the layout. */
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Respect the OS setting even for the CSS-only animations above. */
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    background-image: linear-gradient(
+      100deg,
+      var(--color-accent),
+      color-mix(in oklab, var(--color-accent) 55%, var(--color-surface-400))
+    );
+    background-clip: text;
+    color: transparent;
+  }
+
+  .grid-backdrop {
+    background-image:
+      linear-gradient(to right, var(--color-border) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--color-border) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 55%, transparent 100%);
+  }
+}
+
+/* Custom scrollbar — cosmetic only, degrades cleanly where unsupported. */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg-soft);
+}
+::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--color-accent) 45%, var(--color-border));
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent);
+}
+
+::selection {
+  background: color-mix(in oklab, var(--color-accent) 28%, transparent);
+}
