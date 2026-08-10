@@ -1,0 +1,8 @@
+# Production site — crawling is welcome.
+User-agent: *
+Allow: /
+
+# Note: Vercel preview deployments (*-git-*.vercel.app) serve this same file.
+# To keep previews out of search results, enable Deployment Protection in
+# Vercel → Project → Settings → Deployment Protection, which puts previews
+# behind authentication entirely. See the Security section of README.md.
