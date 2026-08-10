@@ -298,6 +298,30 @@ Both are variable fonts, so one 48 KB and one 25 KB file cover every weight.
   `npm audit --audit-level=high` on every push and PR. Uses `npm ci` so CI can
   never resolve a different dependency tree than the reviewed lockfile.
 
+**TypeScript is pinned to 6.x on purpose.** TypeScript 7 is the Go-based
+compiler rewrite, and no `typescript-eslint` release supports it yet — every
+version, including the canary alpha, peer-requires
+`typescript >=4.8.4 <6.1.0`. A TS 7 bump makes `npm install` fail with
+`ERESOLVE` and breaks the build, so `dependabot.yml` ignores TypeScript *major*
+updates. Minor and patch updates still come through.
+
+Lift the hold when this prints a range that allows 7:
+
+```bash
+npm view typescript-eslint@latest peerDependencies
+```
+
+Then delete the `ignore` entry for `typescript` in
+[`dependabot.yml`](.github/dependabot.yml) and bump both packages together —
+they are in the same `lint-toolchain` group so Dependabot will do it in one PR.
+
+**Vercel skips Dependabot branches.** `ignoreCommand` in
+[`vercel.json`](vercel.json) exits 0 (skip) for any `dependabot/*` branch and 1
+(build) for everything else, so dependency PRs no longer burn preview builds or
+send failure emails. Your own feature branches still get previews. Vercel also
+installs with `npm ci` rather than `npm install`, so a deploy can never silently
+resolve a dependency tree different from the committed lockfile.
+
 **Known advisory, assessed as not applicable:** `npm audit` reports two high
 findings for `react-router` (RSC Mode CSRF Bypass). This site is a client-side
 SPA with no RSC mode and no server actions, so the vulnerable code path is never
