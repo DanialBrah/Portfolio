@@ -9,10 +9,36 @@ updates:
     open-pull-requests-limit: 5
     labels:
       - dependencies
-    # Group routine bumps into one PR so the inbox stays quiet; security
-    # advisories are still raised individually and immediately by Dependabot
-    # regardless of this schedule.
+
+    ignore:
+      # TypeScript 7 is the Go-based compiler rewrite, and no typescript-eslint
+      # release supports it yet — every version including the canary alpha
+      # peer-requires `typescript >=4.8.4 <6.1.0`. A TS 7 bump therefore makes
+      # `npm install` fail with ERESOLVE and breaks the Vercel build.
+      #
+      # Minor and patch updates to TypeScript 6 still come through.
+      #
+      # Remove this entry once typescript-eslint ships a stable release whose
+      # peer range allows TS 7. Check with:
+      #   npm view typescript-eslint@latest peerDependencies
+      - dependency-name: typescript
+        update-types:
+          - version-update:semver-major
+
     groups:
+      # Keep the lint toolchain moving as a unit. These packages peer-depend on
+      # each other, so bumping one alone is what produced the broken PR above.
+      lint-toolchain:
+        patterns:
+          - typescript
+          - typescript-eslint
+          - eslint
+          - '@eslint/*'
+          - 'eslint-plugin-*'
+
+      # Everything else: routine bumps batched into one PR to keep the inbox
+      # quiet. Security advisories are still raised immediately and separately,
+      # regardless of this schedule.
       minor-and-patch:
         update-types:
           - minor
